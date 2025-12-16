@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>CATTTT>CATTT>C
+  <title>療癒小遊戲：貓咪追光點</title>
   <style>
     html, body {
       margin: 0;
@@ -90,30 +90,41 @@
       ctx.save();
       ctx.translate(cat.x, cat.y);
 
-      // 身體
+      // 身體（趴著的橢圓）
       ctx.beginPath();
-      ctx.arc(0, 0, cat.size, 0, Math.PI * 2);
-      ctx.fillStyle = "#d9a066";
+      ctx.ellipse(0, 8, cat.size * 1.4, cat.size * 0.9, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "#f2b36f";
       ctx.fill();
 
-      // 耳朵
+      // 頭（大頭 Q 版）
       ctx.beginPath();
-      ctx.moveTo(-14, -18);
-      ctx.lineTo(-4, -30);
-      ctx.lineTo(4, -18);
+      ctx.arc(0, -8, cat.size * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 耳朵（小小的）
+      ctx.beginPath();
+      ctx.moveTo(-14, -22);
+      ctx.lineTo(-6, -34);
+      ctx.lineTo(2, -22);
       ctx.fill();
 
       ctx.beginPath();
-      ctx.moveTo(14, -18);
-      ctx.lineTo(4, -30);
-      ctx.lineTo(-4, -18);
+      ctx.moveTo(14, -22);
+      ctx.lineTo(6, -34);
+      ctx.lineTo(-2, -22);
       ctx.fill();
 
-      // 眼睛
+      // 眼睛（更可愛）
       ctx.fillStyle = "#333";
       ctx.beginPath();
-      ctx.arc(-6, -4, 3, 0, Math.PI * 2);
-      ctx.arc(6, -4, 3, 0, Math.PI * 2);
+      ctx.arc(-6, -10, 2.5, 0, Math.PI * 2);
+      ctx.arc(6, -10, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 鼻子
+      ctx.fillStyle = "#d97b7b";
+      ctx.beginPath();
+      ctx.arc(0, -6, 1.8, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
