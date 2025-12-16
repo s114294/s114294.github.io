@@ -1,16 +1,61 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>貓咪追光點</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>療癒小遊戲：貓咪追光點</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: linear-gradient(#fdf6e3, #f5efe6);
+      font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
+    }
+
+    #hint {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.8);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #555;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-  <div id="scene">
-    <div id="cat">🐱</div>
-    <div id="dot"></div>
-  </div>
+  <canvas id="game"></canvas>
+  <div id="hint">點擊畫面，製造光點，貓咪會追過去 🐱✨</div>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    // 光點
+    let light = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      r: 8,
+      active: false
+    };
+
+    // 貓咪
+    const cat = {
+      x: canvas.width / 2,
+      y: c
