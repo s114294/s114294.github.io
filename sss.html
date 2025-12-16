@@ -25,6 +25,7 @@
       font-size: 14px;
       color: #555;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 10;
     }
 
     canvas {
@@ -37,9 +38,11 @@
   <div id="hint">點擊畫面，製造光點，貓咪會追過去 🐱✨</div>
 
   <script>
+    // 取得 Canvas 與畫筆
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
 
+    // 讓 Canvas 滿版
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -47,15 +50,99 @@
     window.addEventListener("resize", resize);
     resize();
 
-    // 光點
-    let light = {
+    // 光點物件
+    const light = {
       x: canvas.width / 2,
       y: canvas.height / 2,
       r: 8,
       active: false
     };
 
-    // 貓咪
+    // 貓咪物件（⚠️ 這裡是你之前壞掉的地方）
     const cat = {
       x: canvas.width / 2,
-      y: c
+      y: canvas.height / 2,
+      size: 24,
+      speed: 0.05
+    };
+
+    // 點擊產生光點
+    canvas.addEventListener("pointerdown", (e) => {
+      light.x = e.clientX;
+      light.y = e.clientY;
+      light.active = true;
+    });
+
+    // 畫光點
+    function drawLight() {
+      if (!light.active) return;
+      ctx.beginPath();
+      ctx.arc(light.x, light.y, light.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 220, 120, 0.9)";
+      ctx.shadowColor = "rgba(255,220,120,0.8)";
+      ctx.shadowBlur = 20;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // 畫貓咪
+    function drawCat() {
+      ctx.save();
+      ctx.translate(cat.x, cat.y);
+
+      // 身體
+      ctx.beginPath();
+      ctx.arc(0, 0, cat.size, 0, Math.PI * 2);
+      ctx.fillStyle = "#d9a066";
+      ctx.fill();
+
+      // 耳朵
+      ctx.beginPath();
+      ctx.moveTo(-14, -18);
+      ctx.lineTo(-4, -30);
+      ctx.lineTo(4, -18);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(14, -18);
+      ctx.lineTo(4, -30);
+      ctx.lineTo(-4, -18);
+      ctx.fill();
+
+      // 眼睛
+      ctx.fillStyle = "#333";
+      ctx.beginPath();
+      ctx.arc(-6, -4, 3, 0, Math.PI * 2);
+      ctx.arc(6, -4, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // 更新貓咪位置（追光）
+    function update() {
+      if (!light.active) return;
+
+      const dx = light.x - cat.x;
+      const dy = light.y - cat.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > 1) {
+        cat.x += dx * cat.speed;
+        cat.y += dy * cat.speed;
+      }
+    }
+
+    // 主迴圈
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      update();
+      drawLight();
+      drawCat();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script>
+</body>
+</html>
