@@ -24,7 +24,9 @@
       pointer-events: none;
     }
 
-    canvas { display: block; }
+    canvas {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -75,7 +77,11 @@
       const dy = light.y - cat.y;
       const dist = Math.hypot(dx, dy);
 
-      if (Math.abs(dx) > 2) cat.facing = dx > 0 ? 1 : -1;
+      if (Math.abs(dx) > 2) {
+        cat.facing = dx > 0 ? 1 : -1;
+      }
+
+      // 接近光點停下來看
       if (dist < 30) return;
 
       cat.x += dx * cat.speed * cat.boost;
@@ -84,6 +90,7 @@
 
     function drawLight() {
       if (!light.active) return;
+
       const pulse = Math.sin(time * 2) * 2;
       ctx.beginPath();
       ctx.arc(light.x, light.y, light.r + pulse, 0, Math.PI * 2);
@@ -128,28 +135,28 @@
       ctx.arc(56, 2, 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // 🐾 腳（變長版本）
-      const sway = Math.sin(time * 1.4) * 4;
-      const lift = Math.cos(time * 1.4) * 2;
+      // 🐾 腳（慢速晃動版本）
+      const sway = Math.sin(time * 0.6) * 4;
+      const lift = Math.cos(time * 0.6) * 2;
 
       ctx.strokeStyle = bodyColor;
-      ctx.lineWidth = 9;      // 胖度維持
+      ctx.lineWidth = 9;
       ctx.lineCap = "round";
 
-      // 前腳（長）
+      // 前腳
       ctx.beginPath();
       ctx.moveTo(22 + sway, 28);
-      ctx.lineTo(18 - sway, 44 + lift);
+      ctx.lineTo(18 - sway, 46 + lift);
       ctx.stroke();
 
-      // 後腳（長）
+      // 後腳
       ctx.beginPath();
       ctx.moveTo(-8 - sway, 28);
-      ctx.lineTo(-4 + sway, 44 - lift);
+      ctx.lineTo(-4 + sway, 46 - lift);
       ctx.stroke();
 
       // 尾巴
-      const wag = Math.sin(time) * 14;
+      const wag = Math.sin(time * 0.8) * 14;
       ctx.beginPath();
       ctx.moveTo(-70, 14);
       ctx.quadraticCurveTo(-100, wag, -80, -22 + wag);
