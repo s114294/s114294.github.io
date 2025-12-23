@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -24,9 +24,7 @@
       pointer-events: none;
     }
 
-    canvas {
-      display: block;
-    }
+    canvas { display: block; }
   </style>
 </head>
 <body>
@@ -46,7 +44,6 @@
 
     let time = 0;
 
-    // 光點
     const light = {
       x: canvas.width / 2,
       y: canvas.height / 2,
@@ -54,28 +51,22 @@
       active: false
     };
 
-    // 黑貓
     const cat = {
       x: canvas.width / 2,
       y: canvas.height / 2,
       speed: 0.05,
       boost: 1,
-      facing: 1 // 1 向右, -1 向左
+      facing: 1
     };
 
-    canvas.addEventListener("click", (e) => {
+    canvas.addEventListener("click", e => {
       light.x = e.clientX;
       light.y = e.clientY;
       light.active = true;
     });
 
-    canvas.addEventListener("mousedown", () => {
-      cat.boost = 2.5;
-    });
-
-    canvas.addEventListener("mouseup", () => {
-      cat.boost = 1;
-    });
+    canvas.addEventListener("mousedown", () => cat.boost = 2.5);
+    canvas.addEventListener("mouseup", () => cat.boost = 1);
 
     function update() {
       if (!light.active) return;
@@ -84,12 +75,7 @@
       const dy = light.y - cat.y;
       const dist = Math.hypot(dx, dy);
 
-      // 面向光點
-      if (Math.abs(dx) > 2) {
-        cat.facing = dx > 0 ? 1 : -1;
-      }
-
-      // 接近時停下來看
+      if (Math.abs(dx) > 2) cat.facing = dx > 0 ? 1 : -1;
       if (dist < 30) return;
 
       cat.x += dx * cat.speed * cat.boost;
@@ -98,7 +84,6 @@
 
     function drawLight() {
       if (!light.active) return;
-
       const pulse = Math.sin(time * 2) * 2;
       ctx.beginPath();
       ctx.arc(light.x, light.y, light.r + pulse, 0, Math.PI * 2);
@@ -117,8 +102,8 @@
       // 身體
       ctx.fillStyle = bodyColor;
       ctx.save();
-      ctx.translate(0, 12);
-      ctx.scale(2.5, 1);
+      ctx.translate(0, 14);
+      ctx.scale(3.2, 1.2);
       ctx.beginPath();
       ctx.arc(0, 0, 22, 0, Math.PI * 2);
       ctx.fill();
@@ -126,44 +111,48 @@
 
       // 頭
       ctx.beginPath();
-      ctx.arc(45, 0, 22, 0, Math.PI * 2);
+      ctx.arc(50, 2, 24, 0, Math.PI * 2);
       ctx.fill();
 
       // 耳朵
       ctx.beginPath();
-      ctx.moveTo(52, -22);
-      ctx.lineTo(60, -38);
-      ctx.lineTo(42, -24);
+      ctx.moveTo(56, -20);
+      ctx.lineTo(66, -38);
+      ctx.lineTo(44, -24);
       ctx.closePath();
       ctx.fill();
 
       // 眼睛
       ctx.fillStyle = eyeColor;
       ctx.beginPath();
-      ctx.arc(52, -2, 3.5, 0, Math.PI * 2);
+      ctx.arc(56, 2, 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // 腳
-      const step = Math.sin(time * 1.5) * 4;
+      // 🐾 腳（變長版本）
+      const sway = Math.sin(time * 1.4) * 4;
+      const lift = Math.cos(time * 1.4) * 2;
+
       ctx.strokeStyle = bodyColor;
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 9;      // 胖度維持
       ctx.lineCap = "round";
 
+      // 前腳（長）
       ctx.beginPath();
-      ctx.moveTo(30, 26);
-      ctx.lineTo(30, 34 + step);
+      ctx.moveTo(22 + sway, 28);
+      ctx.lineTo(18 - sway, 44 + lift);
       ctx.stroke();
 
+      // 後腳（長）
       ctx.beginPath();
-      ctx.moveTo(-10, 26);
-      ctx.lineTo(-10, 34 - step);
+      ctx.moveTo(-8 - sway, 28);
+      ctx.lineTo(-4 + sway, 44 - lift);
       ctx.stroke();
 
       // 尾巴
-      const wag = Math.sin(time) * 12;
+      const wag = Math.sin(time) * 14;
       ctx.beginPath();
-      ctx.moveTo(-55, 12);
-      ctx.quadraticCurveTo(-85, wag, -65, -18 + wag);
+      ctx.moveTo(-70, 14);
+      ctx.quadraticCurveTo(-100, wag, -80, -22 + wag);
       ctx.stroke();
 
       ctx.restore();
