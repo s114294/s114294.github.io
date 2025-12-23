@@ -10,7 +10,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: linear-gradient(#fdf6e3, #f5efe6); /* 米白療癒背景 */
+      background: linear-gradient(#fdf6e3, #f5efe6);
       font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
     }
 
@@ -19,12 +19,9 @@
       top: 16px;
       left: 50%;
       transform: translateX(-50%);
-      background: transparent;
-      padding: 0;
-      border-radius: 0;
       font-size: 15px;
       color: #666;
-      box-shadow: none;
+      pointer-events: none;
     }
 
     canvas {
@@ -34,7 +31,7 @@
 </head>
 <body>
   <canvas id="game"></canvas>
-  <div id="hint">點擊畫面，製造光點，黑貓會慢慢追過去 🖤✨</div>
+  <div id="hint">點擊畫面，製造光點，黑貓會慢慢追過去</div>
 
   <script>
     const canvas = document.getElementById("game");
@@ -47,7 +44,6 @@
     window.addEventListener("resize", resize);
     resize();
 
-    // 時間（動畫用）
     let time = 0;
 
     // 光點
@@ -74,7 +70,7 @@
     });
 
     canvas.addEventListener("mousedown", () => {
-      cat.boost = 2.5; // 長按加速
+      cat.boost = 2.5;
     });
 
     canvas.addEventListener("mouseup", () => {
@@ -88,28 +84,16 @@
       const dy = light.y - cat.y;
       const dist = Math.hypot(dx, dy);
 
-      // 根據光點方向決定面向
+      // 面向光點
       if (Math.abs(dx) > 2) {
         cat.facing = dx > 0 ? 1 : -1;
       }
 
-      // 接近光點時停下來「看」
-      if (dist < 30) {
-        cat.boost = 0; // 停下來
-        return;
-      }
+      // 接近時停下來看
+      if (dist < 30) return;
 
-      if (dist > 1) {
-        cat.x += dx * cat.speed * cat.boost;
-        cat.y += dy * cat.speed * cat.boost;
-      }
-    }
-
-      if (dist > 1) {
-        cat.x += dx * cat.speed * cat.boost;
-        cat.y += dy * cat.speed * cat.boost;
-      }
-    }
+      cat.x += dx * cat.speed * cat.boost;
+      cat.y += dy * cat.speed * cat.boost;
     }
 
     function drawLight() {
@@ -118,19 +102,19 @@
       const pulse = Math.sin(time * 2) * 2;
       ctx.beginPath();
       ctx.arc(light.x, light.y, light.r + pulse, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255,180,120,0.9)"; // 溫暖橘色，與米白對比
+      ctx.fillStyle = "rgba(255,180,120,0.9)";
       ctx.fill();
     }
 
     function drawCat() {
       ctx.save();
       ctx.translate(cat.x, cat.y);
-      ctx.scale(cat.facing, 1); // 根據方向翻轉
+      ctx.scale(cat.facing, 1);
 
       const bodyColor = "#222";
       const eyeColor = "#ffd966";
 
-      // 身體（用縮放圓形畫橢圓，避免 ellipse 相容性問題）
+      // 身體
       ctx.fillStyle = bodyColor;
       ctx.save();
       ctx.translate(0, 12);
@@ -140,7 +124,7 @@
       ctx.fill();
       ctx.restore();
 
-      // 頭（側面）
+      // 頭
       ctx.beginPath();
       ctx.arc(45, 0, 22, 0, Math.PI * 2);
       ctx.fill();
@@ -153,31 +137,29 @@
       ctx.closePath();
       ctx.fill();
 
-      // 眼睛（側面一隻）
+      // 眼睛
       ctx.fillStyle = eyeColor;
       ctx.beginPath();
       ctx.arc(52, -2, 3.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // 腿（緩慢踏步）
+      // 腳
       const step = Math.sin(time * 1.5) * 4;
       ctx.strokeStyle = bodyColor;
       ctx.lineWidth = 5;
       ctx.lineCap = "round";
 
-      // 前腳
       ctx.beginPath();
       ctx.moveTo(30, 26);
       ctx.lineTo(30, 34 + step);
       ctx.stroke();
 
-      // 後腳
       ctx.beginPath();
       ctx.moveTo(-10, 26);
       ctx.lineTo(-10, 34 - step);
       ctx.stroke();
 
-      // 尾巴（會晃動）
+      // 尾巴
       const wag = Math.sin(time) * 12;
       ctx.beginPath();
       ctx.moveTo(-55, 12);
