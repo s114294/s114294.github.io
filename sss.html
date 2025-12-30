@@ -33,148 +33,168 @@
   <canvas id="game"></canvas>
   <div id="hint">點擊畫面，製造光點，黑貓會慢慢追過去</div>
 
-  <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resize);
-    resize();
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
 
-    let time = 0;
+let time = 0;
+let idleTime = 0;
 
-    const light = {
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      r: 8,
-      active: false
-    };
+const light = {
+  x: 0,
+  y: 0,
+  active: false
+};
 
-    const cat = {
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      speed: 0.05,
-      boost: 1,
-      facing: 1
-    };
+const cat = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  angle: 0,
+  speed: 0.05,
+  boost: 1,
+  sleeping: false
+};
 
-    canvas.addEventListener("click", e => {
-      light.x = e.clientX;
-      light.y = e.clientY;
-      light.active = true;
-    });
+canvas.addEventListener("click", e => {
+  light.x = e.clientX;
+  light.y = e.clientY;
+  light.active = true;
+  idleTime = 0;
+  cat.sleeping = false;
+});
 
-    canvas.addEventListener("mousedown", () => cat.boost = 2.5);
-    canvas.addEventListener("mouseup", () => cat.boost = 1);
+canvas.addEventListener("mousedown", () => cat.boost = 2.5);
+canvas.addEventListener("mouseup", () => cat.boost = 1);
 
-    function update() {
-      if (!light.active) return;
+function update() {
+  if (!light.active) {
+    idleTime++;
+    if (idleTime > 300) cat.sleeping = true;
+    return;
+  }
 
-      const dx = light.x - cat.x;
-      const dy = light.y - cat.y;
-      const dist = Math.hypot(dx, dy);
+  const dx = light.x - cat.x;
+  const dy = light.y - cat.y;
+  const dist = Math.hypot(dx, dy);
 
-      if (Math.abs(dx) > 2) {
-        cat.facing = dx > 0 ? 1 : -1;
-      }
+  cat.angle = Math.atan2(dy, dx);
 
-      // 接近光點停下來看
-      if (dist < 30) return;
+  if (dist < 30) return;
 
-      cat.x += dx * cat.speed * cat.boost;
-      cat.y += dy * cat.speed * cat.boost;
-    }
+  cat.x += dx * cat.speed * cat.boost;
+  cat.y += dy * cat.speed * cat.boost;
 
-    function drawLight() {
-      if (!light.active) return;
+  idleTime = 0;
+}
 
-      const pulse = Math.sin(time * 2) * 2;
-      ctx.beginPath();
-      ctx.arc(light.x, light.y, light.r + pulse, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255,180,120,0.9)";
-      ctx.fill();
-    }
+function drawLight() {
+  if (!light.active) return;
+  const pulse = Math.sin(time * 2) * 2;
+  ctx.beginPath();
+  ctx.arc(light.x, light.y, 8 + pulse, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,170,120,0.9)";
+  ctx.fill();
+}
 
-    function drawCat() {
-      ctx.save();
-      ctx.translate(cat.x, cat.y);
-      ctx.scale(cat.facing, 1);
+function drawCat() {
+  ctx.save();
+  ctx.translate(cat.x, cat.y);
+  ctx.rotate(cat.angle);
 
-      const bodyColor = "#222";
-      const eyeColor = "#ffd966";
+  const bodyColor = "#222";
+  const eyeColor = "#ffd966";
 
-      // 身體
-      ctx.fillStyle = bodyColor;
-      ctx.save();
-      ctx.translate(0, 14);
-      ctx.scale(3.2, 1.2);
-      ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+  // 身體
+  ctx.fillStyle = bodyColor;
+  ctx.save();
+  ctx.translate(0, 14);
+  ctx.scale(3.2, 1.2);
+  ctx.beginPath();
+  ctx.arc(0, 0, 22, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 
-      // 頭
-      ctx.beginPath();
-      ctx.arc(50, 2, 24, 0, Math.PI * 2);
-      ctx.fill();
+  // 頭
+  ctx.beginPath();
+  ctx.arc(50, 2, 24, 0, Math.PI * 2);
+  ctx.fill();
 
-      // 耳朵
-      ctx.beginPath();
-      ctx.moveTo(56, -20);
-      ctx.lineTo(66, -38);
-      ctx.lineTo(44, -24);
-      ctx.closePath();
-      ctx.fill();
+  // 耳朵
+  ctx.beginPath();
+  ctx.moveTo(56, -20);
+  ctx.lineTo(66, -38);
+  ctx.lineTo(44, -24);
+  ctx.closePath();
+  ctx.fill();
 
-      // 眼睛
-      ctx.fillStyle = eyeColor;
-      ctx.beginPath();
-      ctx.arc(56, 2, 4, 0, Math.PI * 2);
-      ctx.fill();
+  // 眼睛（睡覺閉眼）
+  ctx.strokeStyle = eyeColor;
+  ctx.lineWidth = 2;
+  if (cat.sleeping) {
+    ctx.beginPath();
+    ctx.moveTo(50, 2);
+    ctx.lineTo(58, 2);
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = eyeColor;
+    ctx.beginPath();
+    ctx.arc(56, 2, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
-      // 🐾 腳（慢速晃動版本）
-      const sway = Math.sin(time * 0.6) * 4;
-      const lift = Math.cos(time * 0.6) * 2;
+  // 🐾 腳（沿前進方向前後擺）
+  if (!cat.sleeping) {
+    const step = Math.sin(time * 0.6) * 6;
 
-      ctx.strokeStyle = bodyColor;
-      ctx.lineWidth = 9;
-      ctx.lineCap = "round";
+    ctx.strokeStyle = bodyColor;
+    ctx.lineWidth = 9;
+    ctx.lineCap = "round";
 
-      // 前腳
-      ctx.beginPath();
-      ctx.moveTo(22 + sway, 28);
-      ctx.lineTo(18 - sway, 46 + lift);
-      ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(22, 28 + step);
+    ctx.lineTo(22, 48 - step);
+    ctx.stroke();
 
-      // 後腳
-      ctx.beginPath();
-      ctx.moveTo(-8 - sway, 28);
-      ctx.lineTo(-4 + sway, 46 - lift);
-      ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-6, 28 - step);
+    ctx.lineTo(-6, 48 + step);
+    ctx.stroke();
+  }
 
-      // 尾巴
-      const wag = Math.sin(time * 0.8) * 14;
-      ctx.beginPath();
-      ctx.moveTo(-70, 14);
-      ctx.quadraticCurveTo(-100, wag, -80, -22 + wag);
-      ctx.stroke();
+  // 尾巴
+  const wag = Math.sin(time * 0.8) * 14;
+  ctx.beginPath();
+  ctx.moveTo(-70, 14);
+  ctx.quadraticCurveTo(-100, wag, -80, -22 + wag);
+  ctx.stroke();
 
-      ctx.restore();
-    }
+  // 😴 Zzz
+  if (cat.sleeping) {
+    ctx.fillStyle = "#888";
+    ctx.font = "16px sans-serif";
+    ctx.fillText("Zzz", 30, -40 - Math.sin(time) * 5);
+  }
 
-    function loop() {
-      time += 0.05;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      update();
-      drawLight();
-      drawCat();
-      requestAnimationFrame(loop);
-    }
+  ctx.restore();
+}
 
-    loop();
-  </script>
+function loop() {
+  time += 0.05;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  update();
+  drawLight();
+  drawCat();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
 </body>
 </html>
