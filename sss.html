@@ -24,10 +24,13 @@
       pointer-events: none;
     }
 
-    canvas { display: block; }
+    canvas {
+      display: block;
+    }
   </style>
 </head>
 <body>
+
 <canvas id="game"></canvas>
 <div id="hint">點擊畫面，製造光點，黑貓會慢慢追過去</div>
 
@@ -60,6 +63,7 @@ const cat = {
   sleeping: false
 };
 
+// 互動
 canvas.addEventListener("click", e => {
   light.x = e.clientX;
   light.y = e.clientY;
@@ -78,16 +82,19 @@ function update() {
   const dy = light.y - cat.y;
   const dist = Math.hypot(dx, dy);
 
+  // 整隻貓轉向光點
   cat.angle = Math.atan2(dy, dx);
 
-  // 💤 已經到光點附近 → 開始累積 idle
+  // 靠近光點 → 開始 idle
   if (dist < 25) {
     idleTime++;
-    if (idleTime > 180) cat.sleeping = true;
+    if (idleTime > 180) {
+      cat.sleeping = true;
+    }
     return;
   }
 
-  // 移動中 → 清醒
+  // 移動中
   idleTime = 0;
   cat.sleeping = false;
 
@@ -135,10 +142,11 @@ function drawCat() {
   ctx.closePath();
   ctx.fill();
 
-  // 👀 眼睛 / 閉眼
+  // 👀 眼睛
   ctx.strokeStyle = eyeColor;
   ctx.lineWidth = 2;
   if (cat.sleeping) {
+    // 閉眼
     ctx.beginPath();
     ctx.moveTo(48, 2);
     ctx.lineTo(60, 2);
@@ -150,25 +158,31 @@ function drawCat() {
     ctx.fill();
   }
 
-  // 🐾 腳（睡覺就收起來）
+  // 🐾 腳（醒著才動）
   if (!cat.sleeping) {
-    const step = Math.sin(time * 0.6) * 6;
+    const sway = Math.sin(time * 0.6) * 6;
     ctx.strokeStyle = bodyColor;
     ctx.lineWidth = 9;
     ctx.lineCap = "round";
 
+    // 前腳
     ctx.beginPath();
-    ctx.moveTo(22, 28 + step);
-    ctx.lineTo(22, 48 - step);
+    ctx.moveTo(22 + sway, 30);
+    ctx.lineTo(22 - sway, 52);
     ctx.stroke();
 
+    // 後腳
     ctx.beginPath();
-    ctx.moveTo(-6, 28 - step);
-    ctx.lineTo(-6, 48 + step);
+    ctx.moveTo(-6 - sway, 30);
+    ctx.lineTo(-6 + sway, 52);
     ctx.stroke();
   }
 
-  // 尾巴
+  // 🖤 尾巴（睡覺時也保持黑色）
+  ctx.strokeStyle = "#222";
+  ctx.lineWidth = 9;
+  ctx.lineCap = "round";
+
   const wag = Math.sin(time * (cat.sleeping ? 0.3 : 0.8)) * 14;
   ctx.beginPath();
   ctx.moveTo(-70, 14);
@@ -179,7 +193,11 @@ function drawCat() {
   if (cat.sleeping) {
     ctx.fillStyle = "#888";
     ctx.font = "16px sans-serif";
-    ctx.fillText("Zzz", 30, -40 - Math.sin(time * 0.5) * 6);
+    ctx.fillText(
+      "Zzz",
+      30,
+      -40 - Math.sin(time * 0.5) * 6
+    );
   }
 
   ctx.restore();
