@@ -24,14 +24,12 @@
       pointer-events: none;
     }
 
-    canvas {
-      display: block;
-    }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <canvas id="game"></canvas>
-  <div id="hint">點擊畫面，製造光點，黑貓會慢慢追過去</div>
+<canvas id="game"></canvas>
+<div id="hint">點擊畫面，製造光點，黑貓會慢慢追過去</div>
 
 <script>
 const canvas = document.getElementById("game");
@@ -74,11 +72,7 @@ canvas.addEventListener("mousedown", () => cat.boost = 2.5);
 canvas.addEventListener("mouseup", () => cat.boost = 1);
 
 function update() {
-  if (!light.active) {
-    idleTime++;
-    if (idleTime > 300) cat.sleeping = true;
-    return;
-  }
+  if (!light.active) return;
 
   const dx = light.x - cat.x;
   const dy = light.y - cat.y;
@@ -86,12 +80,19 @@ function update() {
 
   cat.angle = Math.atan2(dy, dx);
 
-  if (dist < 30) return;
+  // 💤 已經到光點附近 → 開始累積 idle
+  if (dist < 25) {
+    idleTime++;
+    if (idleTime > 180) cat.sleeping = true;
+    return;
+  }
+
+  // 移動中 → 清醒
+  idleTime = 0;
+  cat.sleeping = false;
 
   cat.x += dx * cat.speed * cat.boost;
   cat.y += dy * cat.speed * cat.boost;
-
-  idleTime = 0;
 }
 
 function drawLight() {
@@ -111,11 +112,11 @@ function drawCat() {
   const bodyColor = "#222";
   const eyeColor = "#ffd966";
 
-  // 身體
+  // 🐈 身體（睡覺會趴扁）
   ctx.fillStyle = bodyColor;
   ctx.save();
   ctx.translate(0, 14);
-  ctx.scale(3.2, 1.2);
+  ctx.scale(3.2, cat.sleeping ? 0.7 : 1.2);
   ctx.beginPath();
   ctx.arc(0, 0, 22, 0, Math.PI * 2);
   ctx.fill();
@@ -134,13 +135,13 @@ function drawCat() {
   ctx.closePath();
   ctx.fill();
 
-  // 眼睛（睡覺閉眼）
+  // 👀 眼睛 / 閉眼
   ctx.strokeStyle = eyeColor;
   ctx.lineWidth = 2;
   if (cat.sleeping) {
     ctx.beginPath();
-    ctx.moveTo(50, 2);
-    ctx.lineTo(58, 2);
+    ctx.moveTo(48, 2);
+    ctx.lineTo(60, 2);
     ctx.stroke();
   } else {
     ctx.fillStyle = eyeColor;
@@ -149,10 +150,9 @@ function drawCat() {
     ctx.fill();
   }
 
-  // 🐾 腳（沿前進方向前後擺）
+  // 🐾 腳（睡覺就收起來）
   if (!cat.sleeping) {
     const step = Math.sin(time * 0.6) * 6;
-
     ctx.strokeStyle = bodyColor;
     ctx.lineWidth = 9;
     ctx.lineCap = "round";
@@ -169,7 +169,7 @@ function drawCat() {
   }
 
   // 尾巴
-  const wag = Math.sin(time * 0.8) * 14;
+  const wag = Math.sin(time * (cat.sleeping ? 0.3 : 0.8)) * 14;
   ctx.beginPath();
   ctx.moveTo(-70, 14);
   ctx.quadraticCurveTo(-100, wag, -80, -22 + wag);
@@ -179,7 +179,7 @@ function drawCat() {
   if (cat.sleeping) {
     ctx.fillStyle = "#888";
     ctx.font = "16px sans-serif";
-    ctx.fillText("Zzz", 30, -40 - Math.sin(time) * 5);
+    ctx.fillText("Zzz", 30, -40 - Math.sin(time * 0.5) * 6);
   }
 
   ctx.restore();
