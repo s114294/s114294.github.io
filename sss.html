@@ -3,32 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Imjessica </title>
+<title>我的追星小天地 ✨</title>
 
 <style>
 body {
     margin: 0;
     font-family: "Microsoft JhengHei", sans-serif;
-    background-color: white;
     overflow-x: hidden;
 }
 
-/* 淺藍小星星背景 */
+/* 🌫️ 模糊背景圖片 */
 body::before {
     content: "";
     position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background-image:
-        radial-gradient(#b9e3ff 1px, transparent 1px),
-        radial-gradient(#b9e3ff 1px, transparent 1px);
-    background-size: 40px 40px;
-    background-position: 0 0, 20px 20px;
-    z-index: -1;
-    opacity: 0.6;
+
+    /* 🔥 改成你的背景圖片 */
+    background-image: url("background.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    filter: blur(12px);          /* 模糊程度 */
+    transform: scale(1.1);       /* 防止模糊邊緣露白 */
+    z-index: -2;
 }
 
-/* 標題區 */
+/* 半透明白色遮罩 */
+.overlay {
+    background-color: rgba(255, 255, 255, 0.8);
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+/* 標題 */
 header {
     text-align: center;
     padding: 40px 20px;
@@ -39,11 +51,7 @@ header h1 {
     color: #5db8ff;
 }
 
-header p {
-    color: #666;
-}
-
-/* 內容卡片 */
+/* 卡片 */
 .card {
     background: white;
     width: 80%;
@@ -51,18 +59,10 @@ header p {
     margin: 30px auto;
     padding: 30px;
     border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     text-align: center;
 }
 
-/* 偶像圖片 */
-.card img {
-    width: 200px;
-    border-radius: 20px;
-    margin: 20px 0;
-}
-
-/* 按鈕 */
 .button {
     display: inline-block;
     padding: 10px 20px;
@@ -70,34 +70,32 @@ header p {
     color: white;
     border-radius: 20px;
     text-decoration: none;
-    transition: 0.3s;
-}
-
-.button:hover {
-    background-color: #5db8ff;
 }
 </style>
 </head>
 
 <body>
 
+<div class="overlay">
+
 <header>
-    <h1>BOYNEXTDOOR TAESAN</h1>
-    <p></p>
+    <h1>✨ 我的追星小天地 ✨</h1>
+    <p>應援 × 收藏 × 愛 💙</p>
 </header>
 
 <div class="card">
-    <h2>漢泰山</h2>
-    <img src="https://via.placeholder.com/200" alt="偶像照片">
-    <p>這裡可以寫你喜歡他的原因、應援心得、演唱會感想等等！</p>
+    <h2>💫 我的本命</h2>
+    <p>這裡可以寫你為什麼喜歡他、舞台魅力、入坑原因！</p>
     <a href="#" class="button">應援專區</a>
 </div>
 
 <div class="card">
     <h2>📅 追星紀錄</h2>
-    <p>✔ 第一次認識他：XXXX年</p>
-    <p>✔ 看過的演唱會：</p>
-    <p>✔ 收藏專輯數量：</p>
+    <p>✔ 入坑年份：</p>
+    <p>✔ 最愛歌曲：</p>
+    <p>✔ 看過演唱會：</p>
+</div>
+
 </div>
 
 </body>
