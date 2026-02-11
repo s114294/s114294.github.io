@@ -1,218 +1,104 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <title>CAT</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: linear-gradient(#fdf6e3, #f5efe6);
-      font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imjessica </title>
 
-    #hint {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 15px;
-      color: #666;
-      pointer-events: none;
-    }
+<style>
+body {
+    margin: 0;
+    font-family: "Microsoft JhengHei", sans-serif;
+    background-color: white;
+    overflow-x: hidden;
+}
 
-    canvas {
-      display: block;
-    }
-  </style>
+/* 淺藍小星星背景 */
+body::before {
+    content: "";
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(#b9e3ff 1px, transparent 1px),
+        radial-gradient(#b9e3ff 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+/* 標題區 */
+header {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+header h1 {
+    font-size: 40px;
+    color: #5db8ff;
+}
+
+header p {
+    color: #666;
+}
+
+/* 內容卡片 */
+.card {
+    background: white;
+    width: 80%;
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+/* 偶像圖片 */
+.card img {
+    width: 200px;
+    border-radius: 20px;
+    margin: 20px 0;
+}
+
+/* 按鈕 */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #87cefa;
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.button:hover {
+    background-color: #5db8ff;
+}
+</style>
 </head>
+
 <body>
 
-<canvas id="game"></canvas>
-<div id="hint">點擊畫面，製造光點，黑貓會慢慢追過去</div>
+<header>
+    <h1>✨ 我的追星小天地 ✨</h1>
+    <p>記錄我最喜歡的偶像 💙</p>
+</header>
 
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+<div class="card">
+    <h2>💫 我的本命</h2>
+    <img src="https://via.placeholder.com/200" alt="偶像照片">
+    <p>這裡可以寫你喜歡他的原因、應援心得、演唱會感想等等！</p>
+    <a href="#" class="button">應援專區</a>
+</div>
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resize);
-resize();
+<div class="card">
+    <h2>📅 追星紀錄</h2>
+    <p>✔ 第一次認識他：XXXX年</p>
+    <p>✔ 看過的演唱會：</p>
+    <p>✔ 收藏專輯數量：</p>
+</div>
 
-let time = 0;
-let idleTime = 0;
-
-const light = {
-  x: 0,
-  y: 0,
-  active: false
-};
-
-const cat = {
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  angle: 0,
-  speed: 0.05,
-  boost: 1,
-  sleeping: false
-};
-
-// 互動
-canvas.addEventListener("click", e => {
-  light.x = e.clientX;
-  light.y = e.clientY;
-  light.active = true;
-  idleTime = 0;
-  cat.sleeping = false;
-});
-
-canvas.addEventListener("mousedown", () => cat.boost = 2.5);
-canvas.addEventListener("mouseup", () => cat.boost = 1);
-
-function update() {
-  if (!light.active) return;
-
-  const dx = light.x - cat.x;
-  const dy = light.y - cat.y;
-  const dist = Math.hypot(dx, dy);
-
-  // 整隻貓轉向光點
-  cat.angle = Math.atan2(dy, dx);
-
-  // 靠近光點 → 開始 idle
-  if (dist < 25) {
-    idleTime++;
-    if (idleTime > 180) {
-      cat.sleeping = true;
-    }
-    return;
-  }
-
-  // 移動中
-  idleTime = 0;
-  cat.sleeping = false;
-
-  cat.x += dx * cat.speed * cat.boost;
-  cat.y += dy * cat.speed * cat.boost;
-}
-
-function drawLight() {
-  if (!light.active) return;
-  const pulse = Math.sin(time * 2) * 2;
-  ctx.beginPath();
-  ctx.arc(light.x, light.y, 8 + pulse, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(255,170,120,0.9)";
-  ctx.fill();
-}
-
-function drawCat() {
-  ctx.save();
-  ctx.translate(cat.x, cat.y);
-  ctx.rotate(cat.angle);
-
-  const bodyColor = "#222";
-  const eyeColor = "#ffd966";
-
-  // 🐈 身體（睡覺會趴扁）
-  ctx.fillStyle = bodyColor;
-  ctx.save();
-  ctx.translate(0, 14);
-  ctx.scale(3.2, cat.sleeping ? 0.7 : 1.2);
-  ctx.beginPath();
-  ctx.arc(0, 0, 22, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  // 頭
-  ctx.beginPath();
-  ctx.arc(50, 2, 24, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 耳朵
-  ctx.beginPath();
-  ctx.moveTo(56, -20);
-  ctx.lineTo(66, -38);
-  ctx.lineTo(44, -24);
-  ctx.closePath();
-  ctx.fill();
-
-  // 👀 眼睛
-  ctx.strokeStyle = eyeColor;
-  ctx.lineWidth = 2;
-  if (cat.sleeping) {
-    // 閉眼
-    ctx.beginPath();
-    ctx.moveTo(48, 2);
-    ctx.lineTo(60, 2);
-    ctx.stroke();
-  } else {
-    ctx.fillStyle = eyeColor;
-    ctx.beginPath();
-    ctx.arc(56, 2, 4, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // 🐾 腳（醒著才動）
-  if (!cat.sleeping) {
-    const sway = Math.sin(time * 0.6) * 6;
-    ctx.strokeStyle = bodyColor;
-    ctx.lineWidth = 9;
-    ctx.lineCap = "round";
-
-    // 前腳
-    ctx.beginPath();
-    ctx.moveTo(22 + sway, 30);
-    ctx.lineTo(22 - sway, 52);
-    ctx.stroke();
-
-    // 後腳
-    ctx.beginPath();
-    ctx.moveTo(-6 - sway, 30);
-    ctx.lineTo(-6 + sway, 52);
-    ctx.stroke();
-  }
-
-  // 🖤 尾巴（睡覺時也保持黑色）
-  ctx.strokeStyle = "#222";
-  ctx.lineWidth = 9;
-  ctx.lineCap = "round";
-
-  const wag = Math.sin(time * (cat.sleeping ? 0.3 : 0.8)) * 14;
-  ctx.beginPath();
-  ctx.moveTo(-70, 14);
-  ctx.quadraticCurveTo(-100, wag, -80, -22 + wag);
-  ctx.stroke();
-
-  // 😴 Zzz
-  if (cat.sleeping) {
-    ctx.fillStyle = "#888";
-    ctx.font = "16px sans-serif";
-    ctx.fillText(
-      "Zzz",
-      30,
-      -40 - Math.sin(time * 0.5) * 6
-    );
-  }
-
-  ctx.restore();
-}
-
-function loop() {
-  time += 0.05;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  update();
-  drawLight();
-  drawCat();
-  requestAnimationFrame(loop);
-}
-
-loop();
-</script>
 </body>
 </html>
